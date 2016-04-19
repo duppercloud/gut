@@ -1,3 +1,4 @@
+
 package main
 
 import (
@@ -149,12 +150,8 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 		}
 	}
 
-	ports, err := FindOpenPorts(1, allContexts...)
-	if err != nil {
-		status.Bail(err)
-	}
 	// status.Printf("Using ports %v\n", ports)
-	gutdPort := ports[0]
+	gutdPort := 9418
 	gutdAddr := fmt.Sprintf("localhost:%d", gutdPort)
 	repoName := RandSeq(8) + local.getPidfileScope()
 
@@ -202,6 +199,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 			})
 		}
 	}
+
 	joinTasks()
 
 	// Fetch the tail hash for all contexts in parallel
@@ -243,7 +241,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 					Shutdown(status.Colorify("@(error:Cannot sync incompatible gut repos.)"), 1)
 				}
 				goTask(ctx, func(taskCtx *SyncContext) {
-					err := taskCtx.GutSetupOrigin(repoName, gutdPort)
+					err := taskCtx.GutSetupOrigin(local.Hostname(), repoName, gutdPort)
 					if err != nil {
 						status.Bail(err)
 					}
@@ -260,7 +258,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 			if err != nil {
 				status.Bail(err)
 			}
-			err = local.GutSetupOrigin(repoName, gutdPort)
+			err = local.GutSetupOrigin(local.Hostname(), repoName, gutdPort)
 			if err != nil {
 				status.Bail(err)
 			}
@@ -279,7 +277,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 			if err != nil {
 				status.Bail(err)
 			}
-			err = local.GutSetupOrigin(repoName, gutdPort)
+			err = local.GutSetupOrigin(local.Hostname(), repoName, gutdPort)
 			if err != nil {
 				status.Bail(err)
 			}
@@ -295,7 +293,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 		}
 	} else {
 		goTask(local, func(taskCtx *SyncContext) {
-			err := taskCtx.GutSetupOrigin(repoName, gutdPort)
+			err := taskCtx.GutSetupOrigin(local.Hostname(), repoName, gutdPort)
 			if err != nil {
 				status.Bail(err)
 			}
@@ -309,7 +307,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 			if err != nil {
 				status.Bail(err)
 			}
-			err = taskCtx.GutSetupOrigin(repoName, gutdPort)
+			err = taskCtx.GutSetupOrigin(local.Hostname(), repoName, gutdPort)
 			if err != nil {
 				status.Bail(err)
 			}

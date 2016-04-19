@@ -41,7 +41,7 @@ func (ctx *SyncContext) GutDaemon(repoName string, bindPort int) (err error) {
 		"--export-all",
 		"--base-path=" + basePath,
 		"--reuseaddr",
-		"--listen=localhost",
+		"--listen=0.0.0.0",
 		"--enable=receive-pack",
 		fmt.Sprintf("--port=%d", bindPort),
 		basePath,
@@ -66,8 +66,8 @@ func (ctx *SyncContext) GutInit() (err error) {
 	return err
 }
 
-func (ctx *SyncContext) GutSetupOrigin(repoName string, connectPort int) (err error) {
-	originUrl := fmt.Sprintf("gut://localhost:%d/%s/", connectPort, repoName)
+func (ctx *SyncContext) GutSetupOrigin(host string, repoName string, connectPort int) (err error) {
+	originUrl := fmt.Sprintf("gut://%s:%d/%s/", host, connectPort, repoName)
 	out, err := ctx.GutOutput("remote")
 	if err != nil {
 		return err
