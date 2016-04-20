@@ -122,7 +122,7 @@ func (ctx *SyncContext) GutMerge(branch string) (err error) {
   return nil
 */
 
-  _, err := ctx.GutQuote("merge", mergeArgs...)
+  _, err = ctx.GutQuote("merge", mergeArgs...)
 	return err
 }
 
@@ -152,7 +152,7 @@ func (ctx *SyncContext) GutFetch() (err error) {
 		status.Printf("RETCODE FOR LOCK FAILURE IS: %d\n", retCode)
 	}
 */
-  _, err := ctx.GutQuote("fetch", "fetch", "origin", "--progress")
+  _, err = ctx.GutQuote("fetch", "fetch", "origin", "--progress")
 
 	return err
 }
