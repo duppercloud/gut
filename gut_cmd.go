@@ -108,6 +108,8 @@ func (ctx *SyncContext) GutMerge(branch string) (err error) {
 		"--strategy-option=theirs", // or "ours"? not sure either is better?
 		"--no-edit",
 	}
+
+/*
 	_, stderr, retCode, err := ctx.GutQuoteBuf("merge", mergeArgs...)
 	if err != nil {
 		return err
@@ -117,7 +119,11 @@ func (ctx *SyncContext) GutMerge(branch string) (err error) {
 		// status.Printf("@(error:Failed to merge due to uncommitted changes.)\n")
 		return NeedsCommitError
 	}
-	return nil
+  return nil
+*/
+
+  _, err := ctx.GutQuote("merge", mergeArgs...)
+	return err
 }
 
 func (ctx *SyncContext) GutCheckoutAsMaster(branch string) (err error) {
@@ -139,10 +145,15 @@ var needsCommitStr = "Your local changes to the following files would be overwri
 func (ctx *SyncContext) GutFetch() (err error) {
 	status := ctx.NewLogger("fetch")
 	status.Printf("@(dim:Fetching changes to) %s@(dim:...)\n", ctx.NameAnsi())
+
+/*
 	_, stderr, retCode, err := ctx.GutQuoteBuf("fetch", "fetch", "origin", "--progress")
 	if strings.Contains(string(stderr), "Cannot lock ref") {
 		status.Printf("RETCODE FOR LOCK FAILURE IS: %d\n", retCode)
 	}
+*/
+  _, err := ctx.GutQuote("fetch", "fetch", "origin", "--progress")
+
 	return err
 }
 
