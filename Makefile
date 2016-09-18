@@ -40,17 +40,18 @@ clean:
 	rm -rf release
 
 package: dev
-	cd release/${OS}/${ARCH} && tar -czvf ${GUT_BINARY}.tgz --exclude=${GUT_BINARY}.tgz . 
+	cd release/${OS}/${ARCH} && tar -czvf ${GUT_BINARY}.tgz --exclude=${GUT_BINARY}.tgz --exclude=gut-2.5.0.tgz . 
 
 publish: package
 	aws --region us-west-1 s3 cp release/${OS}/${ARCH}/${GUT_BINARY}.tgz s3://get.dupper.co/dev/${OS}/${ARCH}/${GUT_BINARY}-${VERSION}.tgz --acl public-read
 
 get-deps: 
-	wget -O release/Linux/x86_64/gut-2.7.3.tgz https://www.tillberg.us/c/d437b2008d313974b4b5a4293bcf93b8b681e65919c74099e6016975387d7eae/gut-linux-2.7.3.tgz
-	wget -O release/Darwin/x86_64/gut-2.7.3.tgz https://www.tillberg.us/c/2cbf485213af3061a3d5ce27211295ae804d535ed4854f9da6d57418bcc39424/gut-darwin-2.7.3.tgz
+	wget -O release/Linux/x86_64/gut-2.5.0.tgz https://www.tillberg.us/c/d437b2008d313974b4b5a4293bcf93b8b681e65919c74099e6016975387d7eae/gut-linux-2.5.0.tgz
+	wget -O release/Darwin/x86_64/gut-2.5.0.tgz https://www.tillberg.us/c/2cbf485213af3061a3d5ce27211295ae804d535ed4854f9da6d57418bcc39424/gut-darwin-2.5.0.tgz
 
-publish-deps: release/${OS}/${ARCH}/gut-2.7.3.tgz
-	aws --region us-west-1 s3 cp release/${OS}/${ARCH}/gut-2.7.3.tgz s3://get.dupper.co/dev/${OS}/${ARCH}/gut-2.7.3.tgz --acl public-read
+publish-deps: release/Linux/x86_64/gut-2.5.0.tgz release/Darwin/x86_64/gut-2.5.0.tgz
+	aws --region us-west-1 s3 cp release/Linux/x86_64/gut-2.5.0.tgz s3://get.dupper.co/dev/Linux/x86_64/gut-2.5.0.tgz --acl public-read
+	aws --region us-west-1 s3 cp release/Darwin/x86_64/gut-2.5.0.tgz s3://get.dupper.co/dev/Darwin/Linux/x86_64/gut-2.5.0.tgz --acl public-read
 
 publish-install-script: install.sh
 	aws --region us-west-1 s3 cp --acl public-read --content-type 'text/plain' ./install.sh s3://get.dupper.co/dev/index 

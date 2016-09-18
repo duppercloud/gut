@@ -12,7 +12,7 @@ dev_version=0.0.1-alpha
 dev_binary=dev
 dev_install_dir=/usr/local
 gut_binary=gut
-gut_version=2.7.3
+gut_version=2.5.0
 gut_install_dir=$HOME/.guts
 
 command_exists() {
