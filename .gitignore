@@ -28,3 +28,8 @@ _testmain.go
 .gutignore
 
 /dist
+
+release
+src
+pkg
+.gut

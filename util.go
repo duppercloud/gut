@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tillberg/ansi-log"
+	"github.com/duppercloud/ansi-log"
 	"github.com/duppercloud/bismuth"
-	"github.com/tillberg/stringset"
-	"github.com/tillberg/watcher"
+	"github.com/duppercloud/stringset"
+	"github.com/duppercloud/watcher"
 )
 
 func WindowsPathToMingwPath(p string) string {

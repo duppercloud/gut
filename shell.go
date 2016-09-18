@@ -15,16 +15,15 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/mitchellh/go-homedir"
-	log "github.com/tillberg/ansi-log"
-	"github.com/tillberg/autorestart"
+	log "github.com/duppercloud/ansi-log"
+	"github.com/duppercloud/autorestart"
 	"github.com/duppercloud/bismuth"
 )
 
 var OptsCommon struct {
 	Verbose       bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
-	Version       bool   `long:"version" description:"Print gut-sync version"`
 	NoColor       bool   `long:"no-color" description:"Disable ANSI colors"`
-	BuildParallel bool   `long:"build-parallel" description:"Build gut-commands in parallel via make -j {num_cores}"`
+	BuildParallel bool   `long:"build-parallel" description:"Build dev-commands in parallel via make -j {num_cores}"`
     IdentityFile  string `short:"i" long:"identity"  description:"Identity file for remote host"`
 
 }
@@ -141,7 +140,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 		hostsStrs = append(hostsStrs, ctx.SyncPathAnsi())
 	}
 	hostsStr := JoinWithAndAndCommas(hostsStrs...)
-	status.Printf("@(dim:Starting gut-sync between) %s@(dim:.)\n", hostsStr)
+	status.Printf("@(dim:Starting dev-sync between) %s@(dim:.)\n", hostsStr)
 
 	for _, ctx := range allContexts {
 		_, err = EnsureBuild(local, ctx)
@@ -233,12 +232,12 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 				tailHashFoundOn = ctx
 			} else {
 				if tailHash != myTailHash {
-					status.Printf("@(error:Found different gut repo base commits:)\n")
+					status.Printf("@(error:Found different dev repo base commits:)\n")
 					status.Printf("@(commit:%s) @(error:at) %s\n",
 						TrimCommit(tailHash), tailHashFoundOn.SyncPathAnsi())
 					status.Printf("@(commit:%s) @(error:at) %s\n",
 						TrimCommit(myTailHash), ctx.SyncPathAnsi())
-					Shutdown(status.Colorify("@(error:Cannot sync incompatible gut repos.)"), 1)
+					Shutdown(status.Colorify("@(error:Cannot sync incompatible dev repos.)"), 1)
 				}
 				goTask(ctx, func(taskCtx *SyncContext) {
 					err := taskCtx.GutSetupOrigin(local.Hostname(), repoName, gutdPort)
@@ -253,7 +252,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 	// If local needs to be initialized, do so, either from scratch or by bootstrapping from tailHashFoundOn.
 	if localTailHash == "" {
 		if tailHash == "" {
-			status.Printf("@(dim:No existing gut repo found. Initializing gut repo in %s.)\n", local.SyncPathAnsi())
+			status.Printf("@(dim:No existing dev repo found. Initializing dev repo in %s.)\n", local.SyncPathAnsi())
 			err = local.GutInit()
 			if err != nil {
 				status.Bail(err)
@@ -269,7 +268,7 @@ func Sync(local *SyncContext, remotes []*SyncContext) (err error) {
 			local.UpdateTailHash()
 			tailHash = local.GetTailHash()
 			if tailHash == "" {
-				Shutdown(status.Colorify("Failed to initialize new gut repo."), 1)
+				Shutdown(status.Colorify("Failed to initialize new dev repo."), 1)
 			}
 			tailHashFoundOn = local
 		} else {
@@ -575,19 +574,19 @@ func Shutdown(reason string, exitcode int) {
 func printUsageInfoAndExit() {
 	status := log.New(os.Stderr, "", 0)
 	status.Println("")
-	status.Println("Usage: gut sync [option]... path [{ [user@]host:path | path }]...")
+	status.Println("Usage: dev sync [option]... path [{ [user@]host:path | path }]...")
 	status.Println("")
 	status.Println("Options:")
 	status.Println("      --no-color: Disable ANSI colors")
 	status.Println("       --verbose: Show all commands executed")
-	status.Println("    --build-deps: Build gut-commands from git source instead of downloading tarball")
-	status.Println("--build-parallel: Build gut-commands in parallel via make -j {num_cores}")
+	status.Println("    --build-deps: Build dev-commands from git source instead of downloading tarball")
+	status.Println("--build-parallel: Build dev-commands in parallel via make -j {num_cores}")
 	status.Println("")
 	status.Println("Examples:")
-	status.Println("   Sync folder with one remote: gut sync ~/stuff/ myname@remotehost.com:~/stuff/")
-	status.Println("  Sync folder with two remotes: gut sync stuff/ remotehost1.com:~/work/ bob@remotehost2.com:/tmp/sync")
-	status.Println("          Sync folders locally: gut sync ~/mywork /mnt/backup/mywork/")
-	status.Println("Just track changes, no syncing: gut sync ~/mywork")
+	status.Println("   Sync folder with one remote: dev sync ~/stuff/ myname@remotehost.com:~/stuff/")
+	status.Println("  Sync folder with two remotes: dev sync stuff/ remotehost1.com:~/work/ bob@remotehost2.com:/tmp/sync")
+	status.Println("          Sync folders locally: dev sync ~/mywork /mnt/backup/mywork/")
+	status.Println("Just track changes, no syncing: dev sync ~/mywork")
 	status.Println("")
 	os.Exit(0)
 }
@@ -599,18 +598,23 @@ func main() {
 	log.AddAnsiColorCode("path", 36)
 	var args []string = os.Args[1:]
 	if len(args) == 0 {
-		fmt.Println("You must specify a gut-command, e.g. `gut sync ...`")
+		fmt.Println("You must specify a dev-command, e.g. `dev sync ...`")
 		os.Exit(1)
 	}
 	var cmd = args[0]
+    if cmd == "version" {
+        fmt.Printf("dev  %s\n", GutVersion)
+        os.Exit(0)
+    }
+    
 	if IsGitCommand(cmd) {
 		if IsDangerousGitCommand(cmd) {
 			if len(args) < 2 || args[1] != "--danger" {
 				status := log.New(os.Stderr, "", 0)
-				status.Printf("@(dim:In order to prevent damage caused by accidentally using `)gut %s ...@(dim:`)\n", cmd)
+				status.Printf("@(dim:In order to prevent damage caused by accidentally using `)dev %s ...@(dim:`)\n", cmd)
 				status.Printf("@(dim:in cases where `)git %s ...@(dim:` was intended, you must append `)--danger@(dim:`)\n", cmd)
-				status.Printf("@(dim:immediately after the command, i.e. `)gut %s --danger ...@(dim:`.)\n", cmd)
-				status.Printf("@(dim:Alternatively, you could invoke) gut @(dim:directly at) @(path:%s)@(dim:.)\n", GutExePath)
+				status.Printf("@(dim:immediately after the command, i.e. `)dev %s --danger ...@(dim:`.)\n", cmd)
+				status.Printf("@(dim:Alternatively, you could invoke) dev @(dim:directly at) @(path:%s)@(dim:.)\n", GutExePath)
 				status.Printf("@(dim:The commands that require this flag are:) %s\n", strings.Join(DangerousGitCommands, " "))
 				os.Exit(1)
 			}
@@ -641,10 +645,6 @@ func main() {
 	if OptsCommon.NoColor {
 		log.DisableColor()
 	}
-	if OptsCommon.Version {
-		status.Printf("gut-sync %s\n", GutVersion)
-		os.Exit(0)
-	}
 	bismuth.SetVerbose(OptsCommon.Verbose)
 
 	go func() {
@@ -659,7 +659,7 @@ func main() {
 		Shutdown("Received SIGHUP.", 0)
 	}()
 
-	if cmd == "build" {
+    if cmd == "build" {
 		var local = NewSyncContext()
 		err := local.Connect()
 		if err != nil {
@@ -674,7 +674,7 @@ func main() {
 			status.Bail(err)
 		}
 		if !didSomething {
-			status.Printf("@(dim:gut) " + GitVersion + " @(dim:has already been built.)\n")
+			status.Printf("@(dim:dev) " + GitVersion + " @(dim:has already been built.)\n")
 		}
 	} else if cmd == "sync" {
 		var remoteArgs, err = flags.ParseArgs(&OptsSync, argsRemaining)
@@ -688,10 +688,6 @@ func main() {
 		err = local.ParseSyncPath(OptsSync.Positional.LocalPath)
 		if err != nil {
 			status.Bail(err)
-		}
-		if len(remoteArgs) > 0 && os.Getenv("SSH_AUTH_SOCK") == "" {
-			log.Printf("@(error:SSH_AUTH_SOCK is not set in environment. Start up an ssh agent first before running gut-sync.)\n")
-			Shutdown("", 1)
 		}
 		go func() {
             local.SetKeyFile(OptsCommon.IdentityFile)
