@@ -1,8 +1,0 @@
-{
-  "tools": [
-    {
-      "name": "vim",
-      "cmd": "apt-get install -y vim"
-    }
-  ]
-}

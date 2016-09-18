@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/tillberg/ansi-log"
-	"github.com/dupperinc/bismuth"
+	"github.com/duppercloud/bismuth"
 	"github.com/tillberg/stringset"
 	"github.com/tillberg/watcher"
 )

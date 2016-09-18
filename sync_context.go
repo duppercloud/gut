@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dupperinc/bismuth"
+	"github.com/duppercloud/bismuth"
 )
 
 type SyncContext struct {
@@ -29,7 +29,7 @@ func NewSyncContext() *SyncContext {
 	return ctx
 }
 
-var remotePathRegexp = regexp.MustCompile("^((([^@]+)@)?([^:]+):)?(.+)$")
+var remotePathRegexp = regexp.MustCompile("^((([^@]+)@)?([^:]+):)?(([0-9]+):?)?(.+)$")
 
 func (ctx *SyncContext) ParseSyncPath(path string) error {
 	parts := remotePathRegexp.FindStringSubmatch(path)
@@ -48,7 +48,13 @@ func (ctx *SyncContext) ParseSyncPath(path string) error {
 		}
 		ctx.SetHostname(parts[4])
 	}
-	ctx.syncPath = parts[5]
+
+    if len(parts[6]) > 0 {
+        port, _ := strconv.Atoi(parts[6])
+        ctx.SetPort(port)
+    }    
+
+    ctx.syncPath = parts[7]
 	return nil
 }
 

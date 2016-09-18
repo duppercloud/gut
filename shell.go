@@ -17,20 +17,21 @@ import (
 	"github.com/mitchellh/go-homedir"
 	log "github.com/tillberg/ansi-log"
 	"github.com/tillberg/autorestart"
-	"github.com/dupperinc/bismuth"
+	"github.com/duppercloud/bismuth"
 )
 
 var OptsCommon struct {
-	Verbose       bool `short:"v" long:"verbose" description:"Show verbose debug information"`
-	Version       bool `long:"version" description:"Print gut-sync version"`
-	NoColor       bool `long:"no-color" description:"Disable ANSI colors"`
-	BuildParallel bool `long:"build-parallel" description:"Build gut-commands in parallel via make -j {num_cores}"`
+	Verbose       bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
+	Version       bool   `long:"version" description:"Print gut-sync version"`
+	NoColor       bool   `long:"no-color" description:"Disable ANSI colors"`
+	BuildParallel bool   `long:"build-parallel" description:"Build gut-commands in parallel via make -j {num_cores}"`
+    IdentityFile  string `short:"i" long:"identity"  description:"Identity file for remote host"`
+
 }
 
 var OptsSync struct {
-	IdentityFile string `short:"i" long:"identity"`
 	Positional   struct {
-		LocalPath string
+		LocalPath    string
 	} `positional-args:"yes" required:"yes"`
 }
 
@@ -680,7 +681,7 @@ func main() {
 		if err != nil {
 			printUsageInfoAndExit()
 		}
-
+        
 		ready := make(chan error)
 
 		local := NewSyncContext()
@@ -693,6 +694,7 @@ func main() {
 			Shutdown("", 1)
 		}
 		go func() {
+            local.SetKeyFile(OptsCommon.IdentityFile)
 			err = local.Connect()
 			if err != nil {
 				status.Bail(err)
