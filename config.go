@@ -1,6 +1,6 @@
 package main
 
-const GutVersion = "1.0.3"
+const GutVersion = "0.0.1-alpha"
 const GitRepoUrl = "https://github.com/git/git.git"
 const GitVersion = "v2.5.0"
 const GitWinRepoUrl = "https://github.com/git-for-windows/git.git"

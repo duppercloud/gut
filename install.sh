@@ -69,6 +69,7 @@ install() {
     mkdir -p ${gut_install_dir}
     url="${root_url}/${os}/${machine}/${gut_binary}-${gut_version}.tgz"
     $curl -sSL ${url} | tar -xvz -C ${gut_install_dir} 
+    ln -s ${gut_install_dir}/gut-build/libexec/gut-core/* /usr/local/bin/
     
     exit 0
 }
